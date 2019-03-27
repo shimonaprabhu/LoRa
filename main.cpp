@@ -14,11 +14,15 @@
 using namespace std;
 
 #include "base64.h"
+/*wiringPi is used for GPIO of pins on the raspberryPi*/
 #include <wiringPi.h>
 #include <wiringPiSPI.h>
 
 typedef bool boolean;
 typedef unsigned char byte;
+/*https://lora-alliance.org/sites/default/files/2018-04/lorawantm_regional_parameters_v1.1rb_-_final.pdf
+All the parameters defined below are found in the document page 15 onward
+They are all LoRa alliance standard specified parameters and are fixed*/
 
 static const int CHANNEL = 0;
 
@@ -26,7 +30,9 @@ byte currentMode = 0x81;
 
 char message[256];
 char b64[256];
-
+/*The SX1276/77/78/79 transceivers feature the LoRa® long range modem 
+that provides ultra-long range spread spectrum communication and 
+high interference immunity whilst minimising current consumption*/
 bool sx1272 = true;
 
 byte receivedbytes;
@@ -41,13 +47,14 @@ uint32_t cp_nb_rx_bad;
 uint32_t cp_nb_rx_nocrc;
 uint32_t cp_up_pkt_fwd;
 
+/*LoRa uses what is known as a “chirp” protocol
+The chirp protocol uses fixed amplitude frequency modulation.
+LoRa uses three bandwidths: 125kHz, 250kHz and 500kHz. The chirp uses the entire bandwidth. 
+The spreading factors are - in short - the duration of the chirp. LoRa operates with spread 
+factors from 7 to 12. SF7 is the shortest time on air, SF12 will be the longest. Each step 
+up in spreading factor doubles the time on air to transmit the same amount of data.
+With the same bandwidth longer time on air obviously results in less data transmitted per unit of time.*/
 enum sf_t { SF7=7, SF8, SF9, SF10, SF11, SF12 };
-
-/*******************************************************************************
- *
- * Configure these values!
- *
- *******************************************************************************/
 
 // SX1272 - Raspberry connections
 int ssPin = 6;
